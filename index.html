@@ -715,13 +715,13 @@
 
       let message = "";
       if (score === 20) {
-        message = <span style="font-size: 2.0rem;">"🎉 すばらしい！絶対合格"</span>;
+        message = "🎉 すばらしい！絶対合格";
       } else if (score >= 16) {
-        message = <span style="font-size: 2.0rem;">"😊 凄い！ちゃんと勉強したね！"</span>;
+        message = "😊 凄い！ちゃんと勉強したね！";
       } else if (score >= 12) {
-        message = <span style="font-size: 2.0rem;">"🙂 合格、おめでとう！でも、より高い点数を目指してね！"</span>;
+        message = "🙂 合格、おめでとう！でも、より高い点数を目指してね！";
       } else {
-        message = <span style="font-size: 2.0rem;">"💪 残念、不合格です。もっとべんきょうしろ！！！"</span>;
+        message = "💪 残念、不合格です。もっとべんきょうしろ！！！";
       }
 
       document.getElementById("score").textContent = `スコア：${score} / ${NUM_QUESTIONS}\n${message}`;

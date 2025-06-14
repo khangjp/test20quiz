@@ -8,8 +8,8 @@
     body {
       font-family: sans-serif;
       text-align: center;
-      padding: 50px;
-      background-image: url(kk.jpg);
+      padding: 70px;
+      background-image: url(kk.jpg);max-width: 780px
       background-size: cover;
       background-position: center;
       background-attachment: fixed;
@@ -715,13 +715,13 @@
 
       let message = "";
       if (score === 20) {
-        message = "🎉 すばらしい！絶対合格";
+        message = <span style="font-size: 2.0rem;">"🎉 すばらしい！絶対合格"</span>;
       } else if (score >= 16) {
-        message = "😊 凄い！ちゃんと勉強したね！";
+        message = <span style="font-size: 2.0rem;">"😊 凄い！ちゃんと勉強したね！"</span>;
       } else if (score >= 12) {
-        message = "🙂 合格、おめでとう！でも、より高い点数を目指してね！";
+        message = <span style="font-size: 2.0rem;">"🙂 合格、おめでとう！でも、より高い点数を目指してね！"</span>;
       } else {
-        message = "💪 残念、不合格です。もっとべんきょうしろ！！！";
+        message = <span style="font-size: 2.0rem;">"💪 残念、不合格です。もっとべんきょうしろ！！！"</span>;
       }
 
       document.getElementById("score").textContent = `スコア：${score} / ${NUM_QUESTIONS}\n${message}`;

@@ -723,7 +723,7 @@
       } else {
         message = "<span style='font-size: 24px; color: orange;'>💪 残念、不合格です。もっとべんきょうしろ！！！</span>";
       }
-      document.getElementById("score").textContent = `スコア：${score} / ${NUM_QUESTIONS}\n${message}`;
+      document.getElementById("score").innerHTML = `スコア：${score} / ${NUM_QUESTIONS}\n${message}`;
     }
 
     function reviewAnswers() {

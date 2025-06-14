@@ -723,8 +723,8 @@
       } else {
         message = "💪 残念、不合格です。もっとべんきょうしろ！！！";
       }
-
-      document.getElementById("score").textContent = {font-size:2.0em; `スコア：${score} / ${NUM_QUESTIONS}\n${message}`;}
+      font-size: 2.0rem;
+      document.getElementById("score").textContent = `スコア：${score} / ${NUM_QUESTIONS}\n${message}`;
     }
 
     function reviewAnswers() {

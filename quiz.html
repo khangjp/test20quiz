@@ -1,0 +1,889 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<head>
+  <meta charset="UTF-8" />
+  <title>試験直前対策120問</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 70px;
+      background-image: url(kk.jpg);
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+
+    button { font-size: 2.5rem; margin: 30px; padding: 60px 60px; cursor: pointer; }
+    #result { margin-top: 20px; font-size: 2.0rem; }
+    #reviewList { text-align: left; max-width: 600px; margin: 0 auto; list-style: none; padding: 0; }
+    #reviewList li { margin-bottom: 15px; background: #f0f0f0; padding: 10px; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <h1>試験直前対策120問 😎 <span style="font-size: 0.8em;"> Mỗi lần 20 câu ngẫu nhiên </span>  <span style="font-size: 0.2em;">              @kankan</span></h1>
+  <div id="quiz">
+    <div id="question"style="font-size: 2rem; margin: 30px 0;">読み込み中...</div>
+    <button onclick="answer(true)">○</button>
+    <button onclick="answer(false)">×</button>
+    <div id="result"></div>
+  </div>
+
+  <div id="final" style="display:none;">
+    <h2>結果</h2>
+    <div id="score"></div>
+    <button onclick="reviewAnswers()">見直しするXem lại</button>
+    <button onclick="startQuiz()">もう一度挑戦</button>
+  </div>
+
+  <div id="review" style="display:none;">
+    <h2>見直し</h2>
+    <ul id="reviewList"></ul>
+    <button onclick="exportReviewAsMobileFriendlyPDF()">📄 PDFで保存</button>
+    <button onclick="startQuiz()">テストに戻る</button>
+  </div>
+  
+  <div id="nameInputSection" style="display: none; text-align: center; margin-top: 2rem;">
+  <h2>お名前を入力してください Nhập tên：</h2>
+  <input type="text" id="userName" placeholder="VD：TÈO" style="font-size: 1.2rem; padding: 0.5rem;">
+  <br><br>
+  <button onclick="submitName()" style="font-size: 1.2rem;">結果を見る</button>
+</div>
+
+  <script>
+    const allQuestions = 
+[
+  {
+    "text": "もっこうきかいを つかうとき、てぶくろをします。 ",
+    "answer": false,
+    "translation": "Khi dùng máy gia công gỗ mộc thì phải đeo găng tay."
+  },
+  {
+    "text": "せんばんは、こうさくぶつを かいてんさせて かこうする きかいです。 ",
+    "answer": true,
+    "translation": "Máy tiện せんばん là loại máy gia công bằng sự chuyển động xoay vòng của sản phẩm."
+  },
+  {
+    "text": " デプスゲージでは がいけいすんぽうを はかることができません。 ",
+    "answer": true,
+    "translation": "Thước đo độ sâu không thể đo kích thước bên ngoài."
+  },
+  {
+    "text": " アルミニウムは てつより ねつでんどうりつが おおきい。 ",
+    "answer": true,
+    "translation": "Nhôm có tính dẫn nhiệt lớn hơn sắt."
+  },
+  {
+    "text": " この ひょうしきが あるところは きけんです。 ",
+    "answer": true,
+    "translation": "Những nơi nào có biển hiệu như thế này là nơi nguy hiểm."
+  },
+  {
+    "text": " S45C の C は たんそを あらわしています。  ",
+    "answer": true,
+    "translation": "C trong S45C là biểu thị  cacbon ."
+  },
+  {
+    "text": " せんばんさぎょうを するときは あんぜんぐつを はきます。  ",
+    "answer": true,
+    "translation": "Khi làm công việc tiện thì phải mang giày an toàn."
+  },
+  {
+    "text": " フライスばんは、こうさくぶつを かいてんさせて かこうする きかいです。  ",
+    "answer": false,
+    "translation": "Máy phay là máy gia công bằng cách cho sản phẩm chuyển động quay tròn."
+  },
+  {
+    "text": " これは たちいりきんしの ひょうしき です。 ",
+    "answer": true,
+    "translation": "Biển hiệu này là biển hiệu cấm vào."
+  },
+  {
+    "text": " どうせいまきじゃくの よびすんぽうは、 ゆうこうそくていはんいの さいだい めもりで あらわす  ",
+    "answer": true,
+    "translation": "Kích thước tiêu chuẩn của thước cuộn biểu thị phạm vi đo hợp lệ cao nhất khi đo."
+  },
+  {
+    "text": "ネジやまの たかさは、 ピッチによって かわります。 ",
+    "answer": true,
+    "translation": "Tùy theo bước ren thì độ cao của ren ốc sẽ thay đổi."
+  },
+  {
+    "text": " マイクロメータで かくどを はかることが できます。 ",
+    "answer": false,
+    "translation": "Thước đo micrometer có thể dùng để đo độ."
+  },
+  {
+    "text": " ずめんでは、これは かくれせんを あらわします。___ _ _ _ _ _ _ _ _ _ _ _ _ __ ",
+    "answer": true,
+    "translation": "Ở hình dưới đây, cái này nó biểu thị cho đường ẩn, nét đứt."
+  },
+  {
+    "text": " せいずでは ながさの たんいは mmです。 ",
+    "answer": true,
+    "translation": "Trên bản vẽ, chiều dài có đơn vị là mm."
+  },
+  {
+    "text": " はぐるまの はけいには インボリュ—トと サイクロイドはけいがあります。 ",
+    "answer": true,
+    "translation": "Có các dạng bánh răng đó là インボリュ—ト và　サイクロイド."
+  },
+  {
+    "text": " きんぞくせいちょくしゃくは ノギスより ながさを せいかくに はかれます。 ",
+    "answer": false,
+    "translation": "Thước thẳng kim loại có thể đo độ dài chính xác hơn là thước nogisu."
+  },
+  {
+    "text": " あんぜんつうろに ものを おいては いけません。 ",
+    "answer": true,
+    "translation": "Không được đặt đồ ở trên lối đi an toàn."
+  },
+  {
+    "text": " ダイヤルゲージは いっぱんに、ひかくそくていきとして つかわれる。 ",
+    "answer": true,
+    "translation": "Thước daiyaru ge-ji thường được sử dụng trong so sánh đo lường, kiểm tra độ lệch so với số chuẩn."
+  },
+  {
+    "text": " これは　ひょうめんの　あらさを　あらわすきごうです。　 ",
+    "answer": true,
+    "translation": "Đây là ký hiệu về độ nhám của bề mặt"
+  },
+  {
+    "text": "メートルネジの よびけいは、なみめネジと ほそネジでは おなじです。 ",
+    "answer": true,
+    "translation": "Đối với kích thước dùng để gọi (よびけい) của con ốc đạt tiêu chuẩn ISO quốc tế thì, ốc ren thường なみめネジ và　ốc ren nhỏ ほそネジ là như nhau."
+  },
+  {
+    "text": " M12X1.75 は なみめネジです。 ",
+    "answer": true,
+    "translation": "M12X1.75　 là `namimeneji`."
+  },
+  {
+    "text": "フライスばんでは みぞかこうが できます。 ",
+    "answer": true,
+    "translation": "Máy phay có thể dùng trong gia công tạo rãnh."
+  },
+  {
+    "text": " ひらはぐるまは、ほかの はぐるまに くらべて つくりやすいです。 ",
+    "answer": true,
+    "translation": "Bánh răng thường thì dễ tạo hơn so với các loại bánh răng khác."
+  },
+  {
+    "text": " こうじょうで たいせつな3Sは、せいり・せいとん・せいそうのことを いいます。 ",
+    "answer": true,
+    "translation": "Ở công xưởng 3S quan trọng đó là `seiri` `seiton` `seisou`."
+  },
+  {
+    "text": " すうちせいぎょばんは、テーブなどに、きろくさせた すうちでーたなどによってどうさを せいぎょして かこうする きかいです。  ",
+    "answer": true,
+    "translation": "Máy móc điều khiển con số (Numerical Control)  thì phụ thuộc vào những con số  đã được ghi sẵn ở băng dính sau đó điều khiển thao tác rồi gia công ."
+  },
+  {
+    "text": " ノギスは がいけいすんぽうを はかることが できます。 ",
+    "answer": true,
+    "translation": "Thước nogisu có thể dùng để đo đường kính ngoài của vật."
+  },
+  {
+    "text": " ネジの しゅるいには さんかくねじ、インチねじ、だいけいねじ などがあります。 ",
+    "answer": true,
+    "translation": "Có các loại ốc vít đó là さんかくねじ、インチねじ、だいけいねじ.."
+  },
+  {
+    "text": " ちゅうてつは いものを つくるのに てきしています。 ",
+    "answer": true,
+    "translation": "Gang được sử dụng thích hợp để đúc."
+  },
+  {
+    "text": "メネジの ゆうこうけいと メネジの ないけいは、ちがいます。 ",
+    "answer": true,
+    "translation": "Đường kính hợp lệ và đường kính trong của đai ốc là khác nhau."
+  },
+  {
+    "text": " せんばんなどの せっさくちゅうしんどうは、バイトの じゅみょうに えいきょうしません  ",
+    "answer": false,
+    "translation": "Biên độ rung động khi tiếp xúc để cắt ở máy tiện sẽ không ảnh hưởng tới tuổi thọ của dao バイト."
+  },
+  {
+    "text": " Ø15 は ちょっけい 15mmを あらわしています。 ",
+    "answer": true,
+    "translation": "Đường kính 15mm được biểu thị bằng ký hiệu là Ø15."
+  },
+  {
+    "text": " デプスマイクロメーターは、たかさを はかるのに つかいます。  ",
+    "answer": false,
+    "translation": " Thước Depusuマイクロメーター có thể dùng để đo độ cao."
+  },
+  {
+    "text": "これは せんばんで かこう できません。 ",
+    "answer": false,
+    "translation": "Cái này không thể gia công bằng máy tiện."
+  },
+  {
+    "text": " ノギスは、スケールよりも ながさを せいかくに はかれます。 ",
+    "answer": true,
+    "translation": "So với suke-ru thì nogisu có thể đo chiều dài chuẩn xác hơn."
+  },
+  {
+    "text": " じょうばんの しようめんは しようするまえに、あぶらや ゴミを きれいに ふきとります ",
+    "answer": true,
+    "translation": "Trước khi sử dụng bàn gò phải lau sạch dầu và rác ở mặt sử dụng."
+  },
+  {
+    "text": " この ひょうしきは あるところで、はしってもよいです。  ",
+    "answer": false,
+    "translation": "Ở đâu có biển báo này thì ở đấy có thể chạy được."
+  },
+  {
+    "text": " メートルネジの ひょうじほうで、M10 x 1は なみめネジです。  ",
+    "answer": false,
+    "translation": "Trong bảng kí hiệu của con ốc tiêu chuẩn ISO メートルネジ thì  M10 x 1 là なみめネジ."
+  },
+  {
+    "text": " S45Cは たんそこうの しゅるいを あらわしています。 ",
+    "answer": true,
+    "translation": "S45C là một loại của thép cacbon."
+  },
+  {
+    "text": " ネジの しゅるいのうち、ナットは オネジです。 ",
+    "answer": false,
+    "translation": "Trong các loại ốc vít thì ナットlà thuộc オネジ."
+  },
+  {
+    "text": " はぐるまの はの おおきさは、モジュ―ルで あらわします。  ",
+    "answer": true,
+    "translation": "Độ to của răng của bánh răng được biểu thị là モジュ―ル."
+  },
+  {
+    "text": "ネジの しゅるいのうち、ナットは メネジです。",
+    "answer": true,
+    "translation": "Trong các loại ốc vít thì ナットlà thuộc メネジ."
+  },
+  {
+    "text": " フライスばんでは ずのような そくめんかこうが できます。 ",
+    "answer": true,
+    "translation": "Có thể gia công cạnh của vật như hình dưới đây bằng máy phay. "
+  },
+  {
+    "text": " はすばはぐるまは ひらぐるまより つくりかたが かんたんです。 ",
+    "answer": false,
+    "translation": "Bánh răng はすばはくるま dễ sản xuất hơn bánh răng thường ひらはぐるま."
+  },
+  {
+    "text": " Vブロックの Vみぞの かくどは、いっぱんに ９０ど です。 ",
+    "answer": true,
+    "translation": "Rãnh V ở khối V có góc thường là 90 độ."
+  },
+  {
+    "text": " フライスばんには、 たてがたや よこがたが あります。 ",
+    "answer": true,
+    "translation": "Máy phay thì có dạng đứng và dạng ngang."
+  },
+  {
+    "text": " ちょうごうきんは せっさくこうぐに つかわれることが おおいです。  ",
+    "answer": true,
+    "translation": "Siêu hợp kim thường được sử dụng ở các công cụ cắt mài."
+  },
+  {
+    "text": " さぎょうを するときは そのさぎょうに てきした ふくそうで します。  ",
+    "answer": true,
+    "translation": "Khi làm việc phải mặc đồng phục thích hợp với công việc đó."
+  },
+  {
+    "text": " おなじ おおきさの アルミニウムと てつを、おなじおおきさの ちからでひっぱったときの のびりょうは てつのほうが おおきい。  ",
+    "answer": false,
+    "translation": "Khi kéo một vật bằng nhôm và một vật bằng sắt có cùng độ lớn bằng 1 lực giống nhau thì sắt sẽ bị kéo ra nhiều hơn so với nhôm."
+  },
+  {
+    "text": " M15 X 1.25 は、ネジを あらわす きごうです。 ",
+    "answer": true,
+    "translation": "M15 X 1.25 là ký hiệu biểu thị của ốc vít."
+  },
+  {
+    "text": " S45C は たんそこうの しゅるいを あらわしています。 ",
+    "answer": true,
+    "translation": "S45C là kí hiệu của một loại thép cacbon."
+  },
+  {
+    "text": " ノギスには やじるしの ほうこうに ゆるみがあるほうが よいです。 ",
+    "answer": false,
+    "translation": "Khi đo bằng thước nogisu thì theo hướng mũi tên dưới đây càng lỏng lẽo càng tốt."
+  },
+  {
+    "text": " ポケットに てをいれて さぎょうばを あるいてはいけません。 ",
+    "answer": true,
+    "translation": "Không được bỏ tay vào túi quần vừa đi khi ở trong nơi làm việc."
+  },
+  {
+    "text": " したの えは ただしい はかりかたです。（hình ảnh dùng cây thước kẹp nogisu đo bằng 2 mũi ở trên）",
+    "answer": false,
+    "translation": "Hình dưới đây là cách đo đúng."
+  },
+  {
+    "text": " ねじを １かいてんさせてとき、じくほうこうに すすむ きょりを ピッチといいます。 ",
+    "answer": true,
+    "translation": "Khi vặn ốc vít một vòng thì, cự li tiến vào 1 vòng đó được gọi là ピッチ (bước ren)."
+  },
+  {
+    "text": " でんきの スイッチは みずで ぬれた てで さわっては いけません。  ",
+    "answer": true,
+    "translation": "Không được dùng tay dính nước để chạm vào công tắc nguồn điện."
+  },
+  {
+    "text": " きんぞくせいちょくしゃくは せいのうによって １きゅうから 3きゅうまで とうきゅうが あります。  ",
+    "answer": false,
+    "translation": "Thước thẳng bằng kim loại tùy vào tính năng thì có các cấp độ từ 1 đến 3."
+  },
+  {
+    "text": " この ひょうしきが あるところでは、タバコを すってはいけません。 ",
+    "answer": true,
+    "translation": "Ở đâu có biển hiệu này ở đấy không được hút thuốc."
+  },
+  {
+    "text": " この ひょうしきが あるところでは、かんでんの きけんが あります。 ",
+    "answer": true,
+    "translation": "Nơi có biển hiệu này là nơi có nguy hiểm điện giật."
+  },
+  {
+    "text": " ずの R6 は はんけい 6mm の コーナーの すんぽうを あらわしています。 ",
+    "answer": true,
+    "translation": "R6 ở hình dưới đây biểu thị bán kính 6mm của コーナー"
+  },
+  {
+    "text": " じょうばんには ０きゅうから ２きゅうまで あります。  ",
+    "answer": true,
+    "translation": "Bàn gò thì có từ cấp 0 đến cấp 2."
+  },
+  {
+    "text": " M10は ないけい10mmを あらわしています。 ",
+    "answer": false,
+    "translation": "M10 là biểu thị của đường kính trong là 10mm."
+  },
+  {
+    "text": " ボールばんで あなあけを するときは てぶくろを つけます。 ",
+    "answer": false,
+    "translation": "Khi sử dụng máy khoan bàn để mở lỗ, ta dùng găng tay"
+  },
+  {
+    "text": " きかいを つかうときには てんけんを します。 ",
+    "answer": true,
+    "translation": "Khi sử dụng máy móc thì phải kiểm tra (tenken) mỗi khi sử dụng."
+  },
+  {
+    "text": " Vブロックの Vみぞの かくどは、いっぱんに ６０ど です。 ",
+    "answer": false,
+    "translation": "Rãnh V ở khối V thông thường có góc độ là 60 độ."
+  },
+  {
+    "text": " これは フライスばんでは かこうします。 ",
+    "answer": true,
+    "translation": "Cái này gia công bằng máy phay."
+  },
+  {
+    "text": " メネジけんさは、とまりがわと とおりがわの ひとくみの げんかいゲージで できます。 ",
+    "answer": true,
+    "translation": "Có thể kiểm tra đai ốc メネジ bằng dụng cụ thước đo giới hạn bao gồm 2 phía, phía dừng và phía đi qua được."
+  },
+  {
+    "text": " Ø16 は ちょっけいが 16mmということを あらわします。 ",
+    "answer": true,
+    "translation": "Ø16 là biểu thị đường kính là 16mm."
+  },
+  {
+    "text": " ハスバはぐるまのほうが ひらはぐるまより つくりかたが かんたんです。 ",
+    "answer": false,
+    "translation": "So với bánh răng thường ひらはぐるま thì bánh răng xoắn ハスバはぐるま dễ sản xuất ra hơn."
+  },
+  {
+    "text": " アルミニウムの ひじょうは、てつの ひじゅうの やく1/3 です。 ",
+    "answer": true,
+    "translation": "Trọng lượng riêng của nhôm bằng khoảng 1/3 trọng lượng riêng của sắt."
+  },
+  {
+    "text": " バネざがねは、 ひらざがねに くらべて ゆるみどめの こうかが おおきいです。 ",
+    "answer": true,
+    "translation": "So với ひらざがね thì バネざがね có hiệu quả tác dụng chống bị nới lỏng tốt hơn."
+  },
+  {
+    "text": " たばこは きめられたところで すいます。 ",
+    "answer": true,
+    "translation": "Hút thuốc ở những nơi đã được qui định sẵn."
+  },
+  {
+    "text": " この ひょうしきが あるところは、きんえんです。 ",
+    "answer": true,
+    "translation": "Những nơi có biển hiệu này thì những nơi đó cấm hút thuốc."
+  },
+  {
+    "text": " メネジの ゆうこうけいと メネジの がいけいは おなじです。  ",
+    "answer": false,
+    "translation": "Kích thước hợp lệ và đường kính ngoài của メネジ là bằng nhau."
+  },
+  {
+    "text": " アルミニウムの まるぼうは、おんどが あがると ながさと ふとさが かわります。 ",
+    "answer": true,
+    "translation": "Thanh tròn làm bằng nhôm, khi nhiệt độ tăng thì chiều dài và độ to nó sẽ thay đổi."
+  },
+  {
+    "text": " ノギスで そくていするときは つよく ものを はさんで めもりを よみます。 ",
+    "answer": false,
+    "translation": "Khi đo vật bằng thước nogisu thì kẹp thật mạnh vật vào rồi nhìn vạch để xem kết quả."
+  },
+  {
+    "text": " マイクロメーターで かくどを はかることが できません。 ",
+    "answer": true,
+    "translation": "Thước マイクロメーター  ko thể dùng để đo góc độ."
+  },
+  {
+    "text": " ずめんで、これは ちゅうしんせんを あらわします。________ _ _ _________ _ _ ___________  ",
+    "answer": false,
+    "translation": "Trong bản vẽ thì đường này biểu thị cho đường trung tâm."
+  },
+  {
+    "text": " S55C は S45C より ひっぱりつよさが ちいさいです。  ",
+    "answer": false,
+    "translation": "Độ bền khi kéo của S55C nhỏ hơn S45C"
+  },
+  {
+    "text": " どうごうきんよりも てつのほうが けずりやすいです。 ",
+    "answer": false,
+    "translation": "So với hợp kim đồng thì sắt dễ mài hơn."
+  },
+  {
+    "text": " メートルねじの ねじやまの かくどは ６０℃ です。 ",
+    "answer": true,
+    "translation": "Góc độ của ren con ốc tiêu chuẩn ISO メートルねじ là 60 độ."
+  },
+  {
+    "text": " せいずでは ずのAは すんぽうを あらわしています。(hình có A chỉ vào cộng trừ 0.3)",
+    "answer": false,
+    "translation": "Hình vẽ dưới đây thì A được biểu thị là kích thước."
+  },
+  {
+    "text": " ノギスは ないけいすんぽうを はかることが できます。 ",
+    "answer": true,
+    "translation": "Thước nogisu có thể đo kích thước đường kính bên trong được."
+  },
+  {
+    "text": " M24の オネジの がいけいは、24mm です。 ",
+    "answer": true,
+    "translation": "Đường kính ngoài của oneji của M24 là 24mm. "
+  },
+  {
+    "text": " じくの がいけいは、シリンダーゲージで そくていできます。 ",
+    "answer": false,
+    "translation": "シリンダーゲージ được dùng để đo kích thước phía bên ngoài."
+  },
+  {
+    "text": " かいてんする こうさくきかいは てぶくろを はずして さぎょうします。 ",
+    "answer": true,
+    "translation": "Khi thao tác với máy gia công kiểu xoay, ta tháo găng tay ra."
+  },
+  {
+    "text": " ノギスでは あなの ちょっけいを はかることは できません。 ",
+    "answer": false,
+    "translation": "Thước nogisu không thể đo được đường kính của lỗ."
+  },
+  {
+    "text": " ハイトゲージは いたの あつさを はかります。 ",
+    "answer": false,
+    "translation": "Thước đo độ caoハイトゲージ được dùng để đo độ dày của tấm."
+  },
+  {
+    "text": " せいずでは したの せんは みえない ぶぶんの けいじょうを あらわします。 ",
+    "answer": true,
+    "translation": "Đường ở hình dưới đây biểu thị phần không nhìn thấy ở bản vẽ."
+  },
+  {
+    "text": " だいしゃで ものを はこぶときは つみすぎや スピードの だしすぎに ちゅういします。 ",
+    "answer": true,
+    "translation": "Khi vận chuyển đồ bằng xe đẩy, phải chú ý không di chuyển quá tốc độ hay chất hàng quá nhiều."
+  },
+  {
+    "text": " さぎょうするときは ほごぐを つけます。 ",
+    "answer": true,
+    "translation": "Khi làm việc phải mang đồ bảo hộ."
+  },
+  {
+    "text": "たんそこうは いっぱんに たんその りょうが おおいほど かたくなります。 ",
+    "answer": true,
+    "translation": "Lượng cacbon trong thép cacbon càng lớn thì thép cacbon càng cứng."
+  },
+  {
+    "text": "せんばんさぎょうを するときは あんぜんぐつを はきます。  ",
+    "answer": true,
+    "translation": "Khi thực hiện công việc ở máy tiện thì mang giày an toàn."
+  },
+  {
+    "text": "この ひょうしきが あるところでは ほごぼうを かぶらなくても よいです。 ",
+    "answer": false,
+    "translation": "Nơi có biển hiệu này thì không cần thiết phải đội mũ bảo hộ."
+  },
+  {
+    "text": " フライスばんは はものを まわして かこうします。  ",
+    "answer": true,
+    "translation": "Máy phay là gia công bằng cách xoay lưỡi dao."
+  },
+  {
+    "text": "FC250 は たんそこうの しゅるいを あらわしています。 ",
+    "answer": false,
+    "translation": "FC250 là kí hiệu của một loại thép cacbon."
+  },
+  {
+    "text": "ノギスには あなの ふかさを はかれるものも あります。  ",
+    "answer": true,
+    "translation": "Có loại thước nogisu có thể đo được độ sâu của lỗ."
+  },
+  {
+    "text": " せいずでは Ø のきごうは ちょっけいを あらわしています。 ",
+    "answer": true,
+    "translation": "Ở trong bản vẽ phác thảo thì kí hiệu Ø biểu thị đường kính."
+  },
+  {
+    "text": " せいずでは Rのきごうは はんけいを あらわしています。 ",
+    "answer": true,
+    "translation": "Ở trong bản vẽ phác thảo thì kí hiệu R  biểu thị bán kính."
+  },
+  {
+    "text": " はぐるまのはの　おおきさは　モジュールで　あらわします ",
+    "answer": true,
+    "translation": "Độ lớn của bánh răng được biểu thị bằng module"
+  },
+  {
+    "text": " せいずでは ずは M20の おねじを あらわしています。 ",
+    "answer": false,
+    "translation": "Trong bản vẽ hình dưới đây được biểu thị là oneji của M20."
+  },
+  {
+    "text": " せんばんは はものを まわして かこうします。 ",
+    "answer": false,
+    "translation": "Máy tiện thực hiện quay lưỡi dao để gia công."
+  },
+  {
+    "text": " スケールは ながさを はかる どうぐです。 ",
+    "answer": true,
+    "translation": "Thước thẳngスケール là dụng cụ để đo chiều dài."
+  },
+  {
+    "text": " デプスゲージは いっぱんにふかさを はかるそくていき です。 ",
+    "answer": true,
+    "translation": "Depusuゲージ dùng để đo độ sâu."
+  },
+  {
+    "text": " ドリルは あなを あけるものです。 ",
+    "answer": true,
+    "translation": "Mũi khoan được dùng để tạo lỗ."
+  },
+  {
+    "text": " せんばんでは かいてんちゅうの ワークに てを ふれては いけません. ",
+    "answer": true,
+    "translation": "Khi máy tiện đang xoay thì tuyệt đối không được chạm tay vào sản phẩm."
+  },
+  {
+    "text": " ラジアルまじくうけは　こうそくかいてんするぶぶんのじくうけに　てきしています。  ",
+    "answer": true,
+    "translation": "Đường kính vòng bi cầu phù hợp để làm ổ đỡ cho các bộ phận quay với tốc độ cao."
+  },
+  {
+    "text": " せんばんでは テーバの かこうは できません。 ",
+    "answer": false,
+    "translation": "Máy tiện thì không thể gia công cây tạo ren taro テーバ."
+  },
+  {
+    "text": " これは ひざがたフライスばんです。 ",
+    "answer": false,
+    "translation": "Đây là máy phay kiểu hizagata."
+  },
+  {
+    "text": " あついときの さぎょうは くびや こしに タオルを ぶらさげても よいです。 ",
+    "answer": false,
+    "translation": "Khi làm những việc ở những nơi nóng thì đeo khăn vào cổ hay lưng cũng được."
+  },
+  {
+    "text": " ちゅうてつと　たんそこうは　はいっている　たんその　りょうが　おなじです ",
+    "answer": false,
+    "translation": "Lượng cacbon trong gang và thép là giống nhau"
+  },
+  {
+    "text": " かきげんきんの ばしょで きをつければ ひを つかってはいけません。 ",
+    "answer": true,
+    "translation": "Ở những nơi cấm lửa thì dù có chú ý cẩn thận đi nữa cũng không được sử dụng lửa."
+  },
+  {
+    "text": " ひじょうぐちの まえに ものを おいては いけません。 ",
+    "answer": true,
+    "translation": "Ở trước cửa thoát hiểm thì không được để đồ vật."
+  },
+  {
+    "text": " てつよりも　どうごうきんのほうが　けずりにくいです。 ",
+    "answer": false,
+    "translation": "Hợp kim đồng khó mài hơn là sắt. "
+  },
+  {
+    "text": " さぎょうに つかう こうぐは きまられた ばしょに おきます。 ",
+    "answer": true,
+    "translation": "Các dụng cụ được sử dụng trong công việc phải để ở các vị trí đã qui định."
+  },
+  {
+    "text": " かきげんきんの ばしょで きをつければ ひをつかってもよいです。  ",
+    "answer": false,
+    "translation": "Ở những nơi cấm lửa nếu chú ý cẩn thận thì có thể sử dụng được."
+  },
+  {
+    "text": " こうじょうで たいせつな 4Sとは せいり せいとん せいそう せいけつの ことをいいます ",
+    "answer": true,
+    "translation": "Ở trong xưởng làm việc thì 4S quan trọng đó là seiri  seiton  seisou seiketu."
+  },
+  {
+    "text": " せんばん、フライスばん、ボールばん、けんさくばんは だいひょうてきな こうさくき かいである。  ",
+    "answer": true,
+    "translation": "Có những loại máy gia công tự động CNC như là máy tiện, máy phay, máy khoan, máy mài 2 đầu."
+  },
+  {
+    "text": "ボールばんは はものを かいてんさせて あなあけを する。 ",
+    "answer": true,
+    "translation": "ボールばん(khoan) là quay vật sắc nhọn để mở lỗ."
+  },
+  {
+    "text": " スケールや ノギスなどの めもりは、 ななめほうこうから よむと はかりやすい。  ",
+    "answer": false,
+    "translation": "Vạch chia của thước suke-ru hay là nogisu thì nhìn nghiêng thì sẽ dễ đo hơn."
+  },
+  {
+    "text": " すうちせいぎょこうさくきかいには、CNCせんばん・CNCフライスばんや マシニングセンタ などがある。 ",
+    "answer": true,
+    "translation": "Máy móc điều khiển bằng kỹ thuật số (NC) thì có những loại là tiện CNC , phay CNC, machining center."
+  }
+]
+    ;
+
+    const NUM_QUESTIONS = 20;
+    const HISTORY_LIMIT = 6 * NUM_QUESTIONS;
+    let pastQuestionIndexes = [];
+
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let score = 0;
+    let reviewData = [];
+    
+    function getRandomQuestions() {
+      const availableIndexes = allQuestions
+        .map((_, i) => i)
+        .filter(i => !pastQuestionIndexes.includes(i));
+
+      if (availableIndexes.length < NUM_QUESTIONS) {
+        pastQuestionIndexes = [];
+        return getRandomQuestions();
+      }
+
+      const shuffled = availableIndexes.sort(() => Math.random() - 0.5);
+      const selectedIndexes = shuffled.slice(0, NUM_QUESTIONS);
+      pastQuestionIndexes = [...pastQuestionIndexes, ...selectedIndexes].slice(-HISTORY_LIMIT);
+
+      return selectedIndexes.map(i => allQuestions[i]);
+    }
+
+    function showQuestion() {
+      if (currentIndex < NUM_QUESTIONS) {
+  const q = currentQuestions[currentIndex];
+  document.getElementById("question").textContent = `${currentIndex + 1}問目：${q.text}`;
+  document.getElementById("result").textContent = "";
+} else {
+  document.getElementById("quiz").style.display = "none";
+  document.getElementById("nameInputSection").style.display = "block";
+  window.quizFinishTime = new Date(); // lưu thời gian hoàn thành
+}
+    }
+
+    function answer(userAnswer) {
+      if (currentIndex >= NUM_QUESTIONS) return;
+
+      const q = currentQuestions[currentIndex];
+      const isCorrect = userAnswer === q.answer;
+      if (isCorrect) score++;
+
+      reviewData.push({
+        question: q.text,
+        yourAnswer: userAnswer,
+        correctAnswer: q.answer,
+        translation: q.translation,
+        correct: isCorrect
+      });
+
+      document.getElementById("result").innerHTML = `
+        ${isCorrect ? "✅ 正解！" : "❌ 不正解"}<br>
+        💬 意味：${q.translation}
+      `;
+
+      currentIndex++;
+      setTimeout(showQuestion, 2000);
+}
+    function showFinalResult() {
+      document.getElementById("quiz").style.display = "none";
+      document.getElementById("final").style.display = "block";
+      const nameBlock = document.createElement("div");
+nameBlock.style.textAlign = "center";
+nameBlock.style.fontSize = "1.6rem";
+nameBlock.style.marginBottom = "1rem";
+nameBlock.textContent = `👤 名前：${window.userName}`;
+document.getElementById("final").prepend(nameBlock);
+      let message = "";
+      if (score === 20) {
+        message = "<span style='font-size: 24px; color: red;'>🎉 すばらしい！絶対合格</span>";
+      } else if (score >= 16) {
+        message = "<span style='font-size: 24px; color: blue;'>😊 凄い！ちゃんと勉強したね！</span>";
+      } else if (score >= 12) {
+        message = "<span style='font-size: 24px; color: green;'>🙂 合格、おめでとう！でも、より高い点数を目指してね！</span>";
+      } else {
+        message = "<span style='font-size: 24px; color: orange;'>💪 残念、不合格です。もっとべんきょうしろ！！！</span>";
+      }
+      document.getElementById("score").innerHTML = `スコア：${score} / ${NUM_QUESTIONS}\n${message}`;
+      const finishTime = new Date(); // ghi lại thời gian hoàn thành
+      window.quizFinishTime = finishTime; // lưu vào biến toàn cục
+    }
+
+    function reviewAnswers() {
+      const nameBlock = document.createElement("div");
+nameBlock.style.textAlign = "center";
+nameBlock.style.fontSize = "1.2rem";
+nameBlock.style.marginBottom = "1rem";
+nameBlock.textContent = `👤 名前：${window.userName}`;
+document.getElementById("review").prepend(nameBlock);
+      const list = document.getElementById("reviewList");
+      list.innerHTML = "";
+            reviewData.forEach((entry, index) => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <strong>${index + 1}問目：</strong> ${entry.question}<br>
+          🔤 意味：${entry.translation}<br>
+          ✅ 正解：${entry.correctAnswer ? "○" : "×"} / あなたの答え：${entry.yourAnswer ? "○" : "×"}<br>
+          ${entry.correct ? "🟢 正解" : "🔴 不正解"}
+        `;
+        list.appendChild(li);
+      });
+
+      document.getElementById("final").style.display = "none";
+      document.getElementById("review").style.display = "block";
+// Hiển thị phần review
+document.getElementById("final").style.display = "none";
+document.getElementById("review").style.display = "block";
+
+// Tạo phần hiển thị kết quả
+const resultBlock = document.createElement("div");
+resultBlock.style.textAlign = "center";
+resultBlock.style.fontSize = "1rem";
+resultBlock.style.marginBottom = "0.5rem";
+
+// Tạo nội dung kết quả
+let message = "";
+if (score === 20) {
+  message = "🎉 すばらしい！絶対合格";
+} else if (score >= 16) {
+  message = "😊 凄い！ちゃんと勉強したね！";
+} else if (score >= 12) {
+  message = "🙂 合格、おめでとう！でも、より高い点数を目指してね！";
+} else {
+  message = "💪 残念、不合格です。もっとべんきょうしろ！！！";
+}
+resultBlock.innerHTML = `✅ スコア：${score} / 20<br>${message}`;
+
+// Tạo phần hiển thị thời gian
+const timeBlock = document.createElement("p");
+timeBlock.style.textAlign = "center";
+timeBlock.style.fontSize = "0.7rem";
+timeBlock.style.marginBottom = "0.5rem";
+
+if (window.quizFinishTime) {
+  const formatted = window.quizFinishTime.toLocaleString("ja-JP", {
+    year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", second: "2-digit"
+  });
+  timeBlock.textContent = `🕒 完了時間：${formatted}`;
+} else {
+  timeBlock.textContent = "🕒 完了時間：不明";
+}
+
+// Chèn vào đầu phần review
+const reviewContainer = document.getElementById("review");
+reviewContainer.prepend(timeBlock);
+reviewContainer.prepend(resultBlock);
+          }
+
+    function startQuiz() {
+      currentQuestions = getRandomQuestions();
+      currentIndex = 0;
+      score = 0;
+      reviewData = [];
+
+      document.getElementById("quiz").style.display = "block";
+      document.getElementById("final").style.display = "none";
+      document.getElementById("review").style.display = "none";
+
+      showQuestion();
+    }
+function exportReviewAsMobileFriendlyPDF() {
+  const reviewElement = document.getElementById("review");
+  reviewElement.style.display = "block"; // Hiển thị phần review nếu đang ẩn
+
+  html2canvas(reviewElement, {
+    scale: 1.5, // Giảm scale để nhẹ hơn
+    useCORS: true,
+    scrollY: -window.scrollY
+  }).then(canvas => {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF("p", "mm", "a4");
+
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+
+    const imgWidth = pageWidth;
+    const imgHeight = canvas.height * imgWidth / canvas.width;
+
+    const totalPages = Math.ceil(imgHeight / pageHeight);
+
+    for (let i = 0; i < totalPages; i++) {
+      const sourceY = (i * pageHeight * canvas.width) / pageWidth;
+
+      const pageCanvas = document.createElement("canvas");
+      pageCanvas.width = canvas.width;
+      pageCanvas.height = (pageHeight * canvas.width) / pageWidth;
+
+      const ctx = pageCanvas.getContext("2d");
+      ctx.drawImage(
+        canvas,
+        0,
+        sourceY,
+        canvas.width,
+        pageCanvas.height,
+        0,
+        0,
+        canvas.width,
+        pageCanvas.height
+      );
+
+      const imgData = pageCanvas.toDataURL("image/jpeg", 0.8); // Dùng JPEG, nén nhẹ
+      if (i > 0) pdf.addPage();
+      pdf.addImage(imgData, "JPEG", 0, 0, imgWidth, pageHeight);
+    }
+
+    pdf.save("quiz_review_mobile.pdf");
+  });
+}
+function submitName() {
+  const name = document.getElementById("userName").value.trim();
+  if (!name) {
+    alert("名前を入力してください！");
+    return;
+  }
+
+  window.userName = name; // lưu tên để dùng trong review hoặc PDF
+
+  document.getElementById("nameInputSection").style.display = "none";
+  showFinalResult(); // gọi hàm hiển thị kết quả
+}
+    startQuiz();
+  </script>
+</body>
+</html>
